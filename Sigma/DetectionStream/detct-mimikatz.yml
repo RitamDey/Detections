@@ -1,0 +1,40 @@
+title: File Download Via Bitsadmin
+id: 2ad0739a-d2de-41bd-9d59-f29562a39f55
+description: Detects potential file downloads initiated through Bitsadmin.
+status: test
+author: lazarg
+references:
+  - https://lolbas-project.github.io/lolbas/Binaries/Bitsadmin/
+tags:
+  - attack.defense_evasion
+  - attack.persistence
+  - attack.t1197
+  - attack.s0190
+  - attack.t1036.003
+
+# Solution starts here
+logsource:
+  category: process_creation
+  product: windows
+  service: sysmon
+detection:
+  commandline:
+    OriginalFileName: "bitsadmin.exe"
+    CommandLine|contains: "/transfer"
+  path:
+    CommandLine|contains:  # Add more when needed
+      - "Temp"
+      - "AppData"
+      - "Users\\Public"
+  remote:
+    CommandLine|contains: # Add more when needed
+      - "http:"
+      - "https:"
+      - "ftp:"
+      - "github"
+  condition: commandline and path and remote
+# Solution ends here
+
+falsepositives:
+  - Unknown
+level: medium
